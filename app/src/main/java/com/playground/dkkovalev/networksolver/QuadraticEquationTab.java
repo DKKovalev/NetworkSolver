@@ -7,14 +7,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.NumberPicker;
+import android.widget.TextView;
 
-public class QuadraticEquationTab extends Fragment {
+public class QuadraticEquationTab extends Fragment implements NetworkCallback {
 
     private ClientHandler clientHandler;
     private String address;
     private int port;
 
     private Button buttonSendQuadraticData;
+    private TextView resultTextView;
+    private EditText editTextForA, editTextForB, editTextForC;
 
     public QuadraticEquationTab() {
         // Required empty public constructor
@@ -31,12 +36,19 @@ public class QuadraticEquationTab extends Fragment {
         address = "192.168.1.64";
         port = 8080;
 
-        buttonSendQuadraticData = (Button)view.findViewById(R.id.button_send_quadratic_data);
+        resultTextView = (TextView) view.findViewById(R.id.tv_quadratic_response);
+
+        buttonSendQuadraticData = (Button) view.findViewById(R.id.button_send_quadratic_data);
+
+        editTextForA = (EditText)view.findViewById(R.id.et_quadratic_a);
+        editTextForB = (EditText)view.findViewById(R.id.et_quadratic_b);
+        editTextForC = (EditText)view.findViewById(R.id.et_quadratic_c);
 
         buttonSendQuadraticData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                clientHandler = new ClientHandler(address, port, "Quadratic", 5, 6, 1);
+                clientHandler = new ClientHandler(address, port, "Quadratic", Double.valueOf(editTextForA.getText().toString()), Double.valueOf(editTextForB.getText().toString()), Double.valueOf(editTextForC.getText().toString()));
+                clientHandler.setNetworkCallback(QuadraticEquationTab.this);
                 clientHandler.execute();
             }
         });
@@ -44,4 +56,8 @@ public class QuadraticEquationTab extends Fragment {
         return view;
     }
 
+    @Override
+    public void getServerResponse(String response) {
+        resultTextView.setText(response);
+    }
 }
